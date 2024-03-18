@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: app-config
+  profiles:
+    include:
+      - native
+      - ${SPRING_PROFILES_ACTIVE}
+  cloud:
+    config:
+      server:
+        native:
+          search-locations:
+            - classpath:/config/user-service
+            - classpath:/config/sales-service
+server:
+  port: 8888
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
