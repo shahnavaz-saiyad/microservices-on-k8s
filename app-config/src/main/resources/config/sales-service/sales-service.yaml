@@ -1,2 +1,4 @@
 server:
   port: 8881
+message:
+  from: configserver

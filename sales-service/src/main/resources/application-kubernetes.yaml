@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: sales-service
+  cloud:
+    kubernetes:
+      config:
+        enabled: true # enable to read configuration from ConfigMap
+      discovery:
+        enabled: true
+eureka:
+  client:
+    enabled: false

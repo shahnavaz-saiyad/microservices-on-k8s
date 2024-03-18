@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: sales-service
   labels:
-    app: user-service
+    app: sales-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-service
+      app: sales-service
   template:
     metadata:
       labels:
-        app: user-service
+        app: sales-service
     spec:
-      serviceAccountName: spring-cloud-kubernetes # (1)
+      serviceAccountName: spring-cloud-kubernetes
       containers:
-        - name: user-service
-          image: user-service # (2)
+        - name: sales-service
+          image: sales-service
           ports:
-            - containerPort: 8882
+            - containerPort: 8881
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: development
@@ -31,12 +31,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-service
+  name: sales-service
 spec:
   selector:
-    app: user-service
+    app: sales-service
   ports:
     - protocol: TCP
-      port: 8882
-      targetPort: 8882
+      port: 8881
+      targetPort: 8881
   type: LoadBalancer

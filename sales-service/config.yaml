@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sales-service
+data:
+  application.yaml : |-
+    server:
+      port: 8881
+    message:
+      from: kubernetes-configmap
+    
+  

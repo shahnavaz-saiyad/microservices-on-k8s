@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: sales-service
+  config:
+    import: configserver:http://localhost:8888  # Configuration for non-Kubernetes (default profile)
+    activate:
+      on-profile: local
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: true
