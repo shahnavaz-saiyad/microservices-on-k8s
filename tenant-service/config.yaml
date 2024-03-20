@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tenant-service
+data:
+  application.yaml: |-
+    server:
+      port: 8883
+    message:
+      from: kubernetes-configmap
+    master:
+      datasource:
+        url: jdbc:mysql://mysql:3306/spring-k8s-master
+        username: root
+        password: Mysql8@admin
+        driver-class-name: com.mysql.cj.jdbc.Driver

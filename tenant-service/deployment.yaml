@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tenant-service
+  labels:
+    app: tenant-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tenant-service
+  template:
+    metadata:
+      labels:
+        app: tenant-service
+    spec:
+      serviceAccountName: spring-cloud-kubernetes # (1)
+      containers:
+        - name: tenant-service
+          image: tenant-service # (2)
+          ports:
+            - containerPort: 8883
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: development
+            - name: SPRING_CLOUD_BOOTSTRAP_ENABLED # (3)
+              value: "true"
+            - name: SPRING_CLOUD_KUBERNETES_SECRETS_ENABLEAPI # (4)
+              value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tenant-service
+spec:
+  selector:
+    app: tenant-service
+  ports:
+    - protocol: TCP
+      port: 8883
+      targetPort: 8883
+  type: LoadBalancer

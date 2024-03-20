@@ -12,6 +12,7 @@ spring:
           search-locations:
             - classpath:/config/user-service
             - classpath:/config/sales-service
+            - classpath:/config/tenant-service
 server:
   port: 8888
 management:
