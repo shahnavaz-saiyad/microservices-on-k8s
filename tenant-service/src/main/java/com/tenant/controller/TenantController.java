@@ -1,5 +1,7 @@
 package com.tenant.controller;
 
+import com.tenant.config.DynamicRoutingDataSource;
+import com.tenant.config.TenantDataSourceConfig;
 import com.tenant.entity.master.Tenant;
 import com.tenant.repository.master.TenantRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +15,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TenantController {
     private final TenantRepository tenantRepository;
+    private final DynamicRoutingDataSource dynamicDataSource;
+    private final TenantDataSourceConfig tenantDataSourceConfig;
 
     @PostMapping
     public ResponseEntity<?> registerTenant(@RequestBody Tenant tenant){
+
+        dynamicDataSource.addTargetDataSources(tenant.getTenantUuid(), tenantDataSourceConfig.createDataSourceForTenant(tenant));
+        dynamicDataSource.initialize();
         tenantRepository.save(tenant);
         return ResponseEntity.ok().build();
     }

@@ -64,7 +64,7 @@ public class TenantDataSourceConfig {
 
 
 
-    private DataSource createDataSourceForTenant(Tenant tenant) {
+    public DataSource createDataSourceForTenant(Tenant tenant) {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(tenant.getDataSourceUrl());
         config.setUsername(tenant.getDataSourceUsername());
