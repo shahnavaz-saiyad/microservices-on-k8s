@@ -35,5 +35,9 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
         targetDataSources.put(tenantUuid, dataSource);
         super.setTargetDataSources(targetDataSources);
     }
+
+    public Map<Object, Object> targetDataSources() {
+        return this.targetDataSources;
+    }
 }
 

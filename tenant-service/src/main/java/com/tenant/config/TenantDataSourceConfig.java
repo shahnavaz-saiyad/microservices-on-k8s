@@ -3,7 +3,9 @@ package com.tenant.config;
 import com.tenant.entity.master.Tenant;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -84,5 +86,6 @@ public class TenantDataSourceConfig {
         tenant.setDataSourceDriverClassName(resultSet.getString("data_source_driver_class_name"));
         return tenant;
     }
+
 
 }
