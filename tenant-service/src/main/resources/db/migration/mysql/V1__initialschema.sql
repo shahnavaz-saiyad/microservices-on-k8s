@@ -3,4 +3,4 @@ CREATE TABLE `product` (
            `name` varchar(100) DEFAULT NULL,
            `price` double DEFAULT NULL,
            PRIMARY KEY (`product_id`)
-) ;
+);

@@ -9,6 +9,12 @@ master:
     password: Mysql8@admin
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+tenant:
+  datasource:
+    driver-class-name:
+      mysql: com.mysql.cj.jdbc.Driver
+      postgresql: org.postgresql.Driver
+
 spring:
   flyway:
     enabled: false

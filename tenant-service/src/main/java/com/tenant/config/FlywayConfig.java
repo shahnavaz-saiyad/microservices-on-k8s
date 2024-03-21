@@ -17,11 +17,14 @@ public class FlywayConfig {
     @PostConstruct
     public void migrate() {
         dynamicDataSource.targetDataSources().entrySet().stream().filter((entry) -> !entry.getKey().equals("master"))
-                .forEach((entry) -> migrateDataSource((DataSource) entry.getValue()));
+                .forEach((entry) -> migrateDataSource((DataSource) entry.getValue(), "mysql"));
     }
 
-    public void migrateDataSource(DataSource dataSource) {
-        Flyway flyway = Flyway.configure().dataSource(dataSource).load();
+    public void migrateDataSource(DataSource dataSource, String databasePlatform) {
+        Flyway flyway = Flyway.configure()
+                .dataSource(dataSource)
+                .locations("db/migration/" + databasePlatform)
+                .load();
         flyway.migrate();
     }
 }

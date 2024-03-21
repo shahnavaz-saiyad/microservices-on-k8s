@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -33,6 +34,7 @@ public class TenantDataSourceConfig {
 
     private final DataSource masterDataSource;
     private final JdbcTemplate masterJdbcTemplate;
+    private final Environment environment;
 
     @Bean(name = "entityManager")
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(EntityManagerFactoryBuilder builder) {
@@ -71,21 +73,19 @@ public class TenantDataSourceConfig {
         config.setJdbcUrl(tenant.getDataSourceUrl());
         config.setUsername(tenant.getDataSourceUsername());
         config.setPassword(tenant.getDataSourcePassword());
-        config.setDriverClassName(tenant.getDataSourceDriverClassName());
-
+        config.setDriverClassName(environment.getProperty("tenant.datasource.driver-class-name."+tenant.getDataSourcePlatform()));
 
         return new HikariDataSource(config);
     }
 
-    private Tenant convertTenants(ResultSet resultSet, int i) throws SQLException {
+    public Tenant convertTenants(ResultSet resultSet, int i) throws SQLException {
         Tenant tenant = new Tenant();
         tenant.setTenantUuid(resultSet.getString("tenant_uuid"));
         tenant.setDataSourceUrl(resultSet.getString("data_source_url"));
         tenant.setDataSourceUsername(resultSet.getString("data_source_username"));
         tenant.setDataSourcePassword(resultSet.getString("data_source_password"));
-        tenant.setDataSourceDriverClassName(resultSet.getString("data_source_driver_class_name"));
+        tenant.setDataSourcePlatform(resultSet.getString("data_source_platform"));
         return tenant;
     }
-
 
 }

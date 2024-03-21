@@ -27,7 +27,7 @@ public class TenantController {
         DataSource dataSource = tenantDataSourceConfig.createDataSourceForTenant(tenant);
         dynamicDataSource.addTargetDataSources(tenant.getTenantUuid(), dataSource);
         dynamicDataSource.initialize();
-        flywayConfig.migrateDataSource(dataSource);
+        flywayConfig.migrateDataSource(dataSource, tenant.getDataSourcePlatform());
         tenantRepository.save(tenant);
         return ResponseEntity.ok().build();
     }

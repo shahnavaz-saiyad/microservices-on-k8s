@@ -35,6 +35,6 @@ public class Tenant implements Serializable {
     @Column(name = "data_source_password")
     private String dataSourcePassword;
 
-    @Column(name = "data_source_driver_class_name")
-    private String dataSourceDriverClassName;
+    @Column(name = "data_source_platform")
+    private String dataSourcePlatform;
 }
