@@ -1,14 +1,11 @@
 spring:
   application:
     name: api-gateway
-  cloud:
-    gateway:
-      mvc:
-        routes:
-          - id: user-service
-            uri: lb://user-service
-            predicates:
-              - Path=/user-service/**
+  config:
+    import: configserver:http://localhost:8888  # Configuration for non-Kubernetes (default profile)
+    activate:
+      on-profile: local
+
 eureka:
   client:
     fetch-registry: true
