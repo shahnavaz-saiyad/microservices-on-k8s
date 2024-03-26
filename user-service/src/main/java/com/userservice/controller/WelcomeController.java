@@ -1,12 +1,14 @@
 package com.userservice.controller;
 
+import com.common.config.DynamicRoutingDataSource;
+import com.common.entity.tenant.Product;
+import com.common.repository.tenant.ProductRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +19,9 @@ public class WelcomeController {
     private String messageFrom;
 
     private final DiscoveryClient discoveryClient;
+
+    private final ProductRepository productRepository;
+    private final DynamicRoutingDataSource dynamicRoutingDataSource;
 
     @PostConstruct
     public void postConstruct(){
