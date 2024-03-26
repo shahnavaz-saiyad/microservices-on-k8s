@@ -1,15 +1,12 @@
 spring:
   application:
-    name: user-service
+    name: api-gateway
   cloud:
     kubernetes:
       config:
         enabled: true # enable to read configuration from ConfigMap
       discovery:
         enabled: true
-server:
-  servlet:
-    context-path: /user-service
 eureka:
   client:
     enabled: false

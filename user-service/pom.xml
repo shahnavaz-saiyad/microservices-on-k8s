@@ -21,7 +21,7 @@
     <repositories>
         <repository>
             <id>nexus</id>
-            <url>http://localhost:8081/repository/ims-group/</url>
+            <url>http://localhost:8081/repository/spring-k8s-group/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
