@@ -2,3 +2,17 @@ server:
   port: 8882
 message:
   from: configserver
+spring:
+  flyway:
+    enabled: false
+master:
+  datasource:
+    url: jdbc:mysql://localhost:3306/spring-k8s-master
+    username: root
+    password: Mysql8@admin
+    driver-class-name: com.mysql.cj.jdbc.Driver
+tenant:
+  datasource:
+    driver-class-name:
+      mysql: com.mysql.cj.jdbc.Driver
+      postgresql: org.postgresql.Driver

@@ -1,11 +1,13 @@
 package com.tenant.controller;
 
-import com.tenant.config.DynamicRoutingDataSource;
-import com.tenant.config.FlywayConfig;
-import com.tenant.config.TenantDataSourceConfig;
-import com.tenant.entity.master.Tenant;
-import com.tenant.repository.master.TenantRepository;
+import com.common.config.DynamicRoutingDataSource;
+import com.common.config.FlywayConfig;
+import com.common.config.TenantDataSourceConfig;
+import com.common.entity.master.Tenant;
+import com.common.repository.master.TenantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +22,13 @@ public class TenantController {
     private final DynamicRoutingDataSource dynamicDataSource;
     private final TenantDataSourceConfig tenantDataSourceConfig;
     private final FlywayConfig flywayConfig;
+    private final Environment environment;
 
     @PostMapping
     public ResponseEntity<?> registerTenant(@RequestBody Tenant tenant){
+        String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+tenant.getDataSourcePlatform());
 
-        DataSource dataSource = tenantDataSourceConfig.createDataSourceForTenant(tenant);
+        DataSource dataSource = tenantDataSourceConfig.createDataSourceForTenant(tenant, driverClassName);
         dynamicDataSource.addTargetDataSources(tenant.getTenantUuid(), dataSource);
         dynamicDataSource.initialize();
         flywayConfig.migrateDataSource(dataSource, tenant.getDataSourcePlatform());
