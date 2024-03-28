@@ -37,4 +37,7 @@ public class Tenant implements Serializable {
 
     @Column(name = "data_source_platform")
     private String dataSourcePlatform;
+
+    @Transient
+    private String encryptedDataSource;
 }

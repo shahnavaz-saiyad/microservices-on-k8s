@@ -1,0 +1,6 @@
+{
+    "url": "jdbc:postgresql://localhost:5432/spring-k8s-4?currentSchema=public",
+    "username": "postgres",
+    "password": "postgres",
+    "dataSourcePlatform": "postgresql"
+}

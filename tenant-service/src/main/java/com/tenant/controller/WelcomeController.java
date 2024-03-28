@@ -22,7 +22,6 @@ public class WelcomeController {
 
     private final DiscoveryClient discoveryClient;
     private final DynamicRoutingDataSource dynamicRoutingDataSource;
-    private final TenantRepository tenantRepository;
     private final ProductRepository productRepository;
 
     @PostConstruct
