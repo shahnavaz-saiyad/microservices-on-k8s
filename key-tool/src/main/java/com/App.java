@@ -98,7 +98,7 @@ public class App extends JFrame implements ActionListener {
         if (e.getActionCommand().equals("Encrypt")) {
             try {
                 // Load Public Key from File
-                PublicKey publicKey = KeyFileManager.loadPublicKey("public.key");
+                PublicKey publicKey = KeyFileManager.loadPublicKey("public.pem");
 
                 // Get text from input text area
                 String plaintext = inputTextArea.getText();
@@ -120,10 +120,44 @@ public class App extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
+//        generateKeyPair();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new App().setVisible(true);
             }
         });
     }
+
+    private static void generateKeyPair() {
+        try {
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            keyGen.initialize(2048);
+
+            // Generate Key Pair
+            KeyPair keyPair = keyGen.generateKeyPair();
+
+            // Save Public and Private Keys
+            KeyFileManager.savePublicKey(keyPair.getPublic(), "public.pem");
+            KeyFileManager.savePrivateKey(keyPair.getPrivate(), "private.pem");
+
+            PublicKey publicKey = KeyFileManager.loadPublicKey("public.pem");
+            PrivateKey privateKey = KeyFileManager.loadPrivateKey("private.pem");
+
+            System.out.println("Keys loaded successfully.");
+            String plaintext = "Hello, World!";
+            byte[] encryptedText = RSAEncryption.encrypt(plaintext, publicKey);
+            String decryptedText = RSAEncryption.decrypt(encryptedText, privateKey);
+
+            System.out.println("Original: " + plaintext);
+            System.out.println("Encrypted: " + new String(encryptedText));
+            System.out.println("Decrypted: " + decryptedText);
+
+
+        } catch (Exception e) {
+            System.err.println("Error generating and saving keys: " + e.getMessage());
+        }
+
+    }
+
+
 }

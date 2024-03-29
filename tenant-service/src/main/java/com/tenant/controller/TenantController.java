@@ -14,15 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -61,15 +59,32 @@ public class TenantController {
 
     public static PrivateKey loadPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 
-        ClassPathResource classPathResource = new ClassPathResource("private.key");
-        InputStream inputStream = classPathResource.getInputStream();
-//        FileInputStream fis = new FileInputStream(new File("encryption-decryption/encryption-keys", filename));
-        byte[] encodedPrivateKey = new byte[inputStream.available()];
-        inputStream.read(encodedPrivateKey);
-        inputStream.close();
+        ClassPathResource classPathResource = new ClassPathResource("private.pem");
 
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
-        return keyFactory.generatePrivate(privateKeySpec);
+        // Read the Base64-encoded key from file
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(classPathResource.getFile()))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.startsWith("-----") && !line.isEmpty())
+                    sb.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Decode the Base64-encoded key bytes
+        byte[] encodedPrivateKey = Base64.getDecoder().decode(sb.toString());
+
+        KeyFactory keyFactory = null;
+        try {
+            keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
+            return keyFactory.generatePrivate(privateKeySpec);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 }
