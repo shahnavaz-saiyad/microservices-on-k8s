@@ -38,7 +38,9 @@ public class MasterDataSourceConfig {
         config.setPassword(environment.getProperty("master.datasource.password"));
         config.setDriverClassName(environment.getProperty("master.datasource.driver-class-name"));
 
-        return new HikariDataSource(config);
+        DataSource dataSource = new HikariDataSource(config);
+        FlywayConfig.migrateDataSource(dataSource, "master");
+        return dataSource;
     }
 
     @Bean

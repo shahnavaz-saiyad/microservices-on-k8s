@@ -1,8 +1,9 @@
 package com.common.config;
 
+import com.common.dto.DecryptedDatasource;
 import com.common.entity.master.Tenant;
+import com.common.util.EncryptionUtility;
 import jakarta.annotation.PostConstruct;
-import jakarta.persistence.NamedNativeQuery;
 import lombok.RequiredArgsConstructor;
 import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +12,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.function.Function;
 
 @Configuration
 @RequiredArgsConstructor
@@ -21,21 +21,22 @@ public class FlywayConfig {
     private final Environment environment;
 
     @PostConstruct
-    public void migrate() {
+    public void migrate() throws Exception {
         List<Tenant> tenants = masterJdbcTemplate.query("SELECT * from tenant", TenantDataSourceConfig::convertTenants);
 
         for (Tenant tenant : tenants) {
-            String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+tenant.getDataSourcePlatform());
+            DecryptedDatasource decryptedDatasource = EncryptionUtility.decryptDataSource(tenant);
+            String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+decryptedDatasource.getDataSourcePlatform());
 
-            DataSource dataSource = TenantDataSourceConfig.createDataSourceForTenant(tenant, driverClassName);
-            migrateDataSource(dataSource, tenant.getDataSourcePlatform());
+            DataSource dataSource = TenantDataSourceConfig.createDataSourceForTenant(decryptedDatasource, driverClassName);
+            migrateDataSource(dataSource, decryptedDatasource.getDataSourcePlatform());
         }
 
 //        dynamicDataSource.targetDataSources().entrySet().stream().filter((entry) -> !entry.getKey().equals("master"))
 //                .forEach((entry) -> migrateDataSource((DataSource) entry.getValue(), "mysql"));
     }
 
-    public void migrateDataSource(DataSource dataSource, String databasePlatform) {
+    public static void migrateDataSource(DataSource dataSource, String databasePlatform) {
         Flyway flyway = Flyway.configure()
                 .dataSource(dataSource)
                 .locations("db/migration/" + databasePlatform)

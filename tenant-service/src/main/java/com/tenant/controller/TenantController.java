@@ -3,6 +3,7 @@ package com.tenant.controller;
 import com.common.config.DynamicRoutingDataSource;
 import com.common.config.FlywayConfig;
 import com.common.config.TenantDataSourceConfig;
+import com.common.dto.DecryptedDatasource;
 import com.common.entity.master.Tenant;
 import com.common.repository.master.TenantRepository;
 import com.common.util.EncryptionUtility;
@@ -36,17 +37,18 @@ public class TenantController {
 
     @PostMapping
     public ResponseEntity<?> registerTenant(@RequestBody Tenant tenant) throws Exception {
-        String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+tenant.getDataSourcePlatform());
 
-        DataSource dataSource = tenantDataSourceConfig.createDataSourceForTenant(tenant, driverClassName);
+        DecryptedDatasource decryptedDatasource = EncryptionUtility.decryptDataSource(tenant);
+
+        String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+decryptedDatasource.getDataSourcePlatform());
+
+        DataSource dataSource = TenantDataSourceConfig.createDataSourceForTenant(decryptedDatasource, driverClassName);
+
         dynamicDataSource.addTargetDataSources(tenant.getTenantUuid(), dataSource);
         dynamicDataSource.initialize();
-        flywayConfig.migrateDataSource(dataSource, tenant.getDataSourcePlatform());
+        flywayConfig.migrateDataSource(dataSource, decryptedDatasource.getDataSourcePlatform());
         tenantRepository.save(tenant);
 
-        byte[] encryptedText = EncryptionUtility.decodeFromString(tenant.getEncryptedDataSource());
-        String decrypt = EncryptionUtility.decrypt(encryptedText, loadPrivateKey());
-        System.out.println(decrypt);
 
         return ResponseEntity.ok().build();
     }
@@ -57,34 +59,5 @@ public class TenantController {
         return ResponseEntity.ok(tenants);
     }
 
-    public static PrivateKey loadPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 
-        ClassPathResource classPathResource = new ClassPathResource("private.pem");
-
-        // Read the Base64-encoded key from file
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(classPathResource.getFile()))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.startsWith("-----") && !line.isEmpty())
-                    sb.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Decode the Base64-encoded key bytes
-        byte[] encodedPrivateKey = Base64.getDecoder().decode(sb.toString());
-
-        KeyFactory keyFactory = null;
-        try {
-            keyFactory = KeyFactory.getInstance("RSA");
-            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
-            return keyFactory.generatePrivate(privateKeySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        return null;
-
-    }
 }

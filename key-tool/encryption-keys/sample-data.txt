@@ -1,6 +1,16 @@
+For Postgresql
 {
-    "url": "jdbc:postgresql://localhost:5432/spring-k8s-4?currentSchema=public",
-    "username": "postgres",
-    "password": "postgres",
+    "dataSourceUrl": "jdbc:postgresql://localhost:5432/spring-k8s-4?currentSchema=public",
+    "dataSourceUsername": "postgres",
+    "dataSourcePassword": "postgres",
     "dataSourcePlatform": "postgresql"
+}
+
+For Mysql
+
+{
+    "dataSourceUrl": "jdbc:mysql://localhost:3306/spring-k8s-t1",
+    "dataSourceUsername": "root",
+    "dataSourcePassword": "Mysql8@admin",
+    "dataSourcePlatform": "mysql"
 }

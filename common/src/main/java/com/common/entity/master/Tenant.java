@@ -26,18 +26,7 @@ public class Tenant implements Serializable {
     @Column(name = "tenant_description")
     private String tenantDescription;
 
-    @Column(name = "data_source_url")
-    private String dataSourceUrl;
 
-    @Column(name = "data_source_username")
-    private String dataSourceUsername;
-
-    @Column(name = "data_source_password")
-    private String dataSourcePassword;
-
-    @Column(name = "data_source_platform")
-    private String dataSourcePlatform;
-
-    @Transient
+    @Column(name = "encrypted_datasource")
     private String encryptedDataSource;
 }

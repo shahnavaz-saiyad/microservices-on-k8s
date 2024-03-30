@@ -1,6 +1,8 @@
 package com.common.config;
 
+import com.common.dto.DecryptedDatasource;
 import com.common.entity.master.Tenant;
+import com.common.util.EncryptionUtility;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +37,7 @@ public class TenantDataSourceConfig {
     private final Environment environment;
 
     @Bean(name = "entityManager")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(EntityManagerFactoryBuilder builder) {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(EntityManagerFactoryBuilder builder) throws Exception {
         return builder.dataSource(dynamicDataSource()).packages("com.common.entity.tenant", "com.common.entity.master").build();
     }
 
@@ -47,15 +49,16 @@ public class TenantDataSourceConfig {
 
 
     @Bean
-    public DynamicRoutingDataSource dynamicDataSource() {
+    public DynamicRoutingDataSource dynamicDataSource() throws Exception {
 
         Map<Object, Object> targetDataSources = new HashMap<>();
         targetDataSources.put("master", masterDataSource);
         List<Tenant> tenants = masterJdbcTemplate.query("SELECT * from tenant", TenantDataSourceConfig::convertTenants);
 
         for (Tenant tenant : tenants) {
-            String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+tenant.getDataSourcePlatform());
-            DataSource dataSource = createDataSourceForTenant(tenant, driverClassName);
+            DecryptedDatasource decryptedDatasource = EncryptionUtility.decryptDataSource(tenant);
+            String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+decryptedDatasource.getDataSourcePlatform());
+            DataSource dataSource = createDataSourceForTenant(decryptedDatasource, driverClassName);
             targetDataSources.put(tenant.getTenantUuid(), dataSource);
         }
 
@@ -67,11 +70,11 @@ public class TenantDataSourceConfig {
 
 
 
-    public static DataSource createDataSourceForTenant(Tenant tenant, String driverClassName) {
+    public static DataSource createDataSourceForTenant(DecryptedDatasource decryptedDatasource, String driverClassName) {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(tenant.getDataSourceUrl());
-        config.setUsername(tenant.getDataSourceUsername());
-        config.setPassword(tenant.getDataSourcePassword());
+        config.setJdbcUrl(decryptedDatasource.getDataSourceUrl());
+        config.setUsername(decryptedDatasource.getDataSourceUsername());
+        config.setPassword(decryptedDatasource.getDataSourcePassword());
         config.setDriverClassName(driverClassName);
 
         return new HikariDataSource(config);
@@ -80,10 +83,7 @@ public class TenantDataSourceConfig {
     public static Tenant convertTenants(ResultSet resultSet, int i) throws SQLException {
         Tenant tenant = new Tenant();
         tenant.setTenantUuid(resultSet.getString("tenant_uuid"));
-        tenant.setDataSourceUrl(resultSet.getString("data_source_url"));
-        tenant.setDataSourceUsername(resultSet.getString("data_source_username"));
-        tenant.setDataSourcePassword(resultSet.getString("data_source_password"));
-        tenant.setDataSourcePlatform(resultSet.getString("data_source_platform"));
+        tenant.setEncryptedDataSource(resultSet.getString("encrypted_datasource"));
         return tenant;
     }
 
