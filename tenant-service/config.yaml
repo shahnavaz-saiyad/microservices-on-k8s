@@ -18,4 +18,9 @@ data:
       datasource:
         driver-class-name:
           mysql: com.mysql.cj.jdbc.Driver
-          postgresql: org.hibernate.dialect.PostgreSQLDialect
+          postgresql: org.postgresql.Driver
+    spring:
+      flyway:
+        enabled: false
+    encryption:
+      private-key: ${PRIVATE_KEY}

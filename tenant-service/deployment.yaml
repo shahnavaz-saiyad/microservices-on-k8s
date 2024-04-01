@@ -27,6 +27,11 @@ spec:
               value: "true"
             - name: SPRING_CLOUD_KUBERNETES_SECRETS_ENABLEAPI # (4)
               value: "true"
+            - name: PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tenant-service
+                  key: private-key
 ---
 apiVersion: v1
 kind: Service

@@ -10,5 +10,6 @@ build:
 deploy:
   kubectl:
     manifests:
+      - secret.yaml
       - config.yaml
       - deployment.yaml

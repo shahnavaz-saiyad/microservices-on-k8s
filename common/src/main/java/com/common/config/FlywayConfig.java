@@ -19,13 +19,14 @@ public class FlywayConfig {
 
     private final JdbcTemplate masterJdbcTemplate;
     private final Environment environment;
+    private final EncryptionUtility encryptionUtility;
 
     @PostConstruct
     public void migrate() throws Exception {
         List<Tenant> tenants = masterJdbcTemplate.query("SELECT * from tenant", TenantDataSourceConfig::convertTenants);
 
         for (Tenant tenant : tenants) {
-            DecryptedDatasource decryptedDatasource = EncryptionUtility.decryptDataSource(tenant);
+            DecryptedDatasource decryptedDatasource = encryptionUtility.decryptDataSource(tenant);
             String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+decryptedDatasource.getDataSourcePlatform());
 
             DataSource dataSource = TenantDataSourceConfig.createDataSourceForTenant(decryptedDatasource, driverClassName);

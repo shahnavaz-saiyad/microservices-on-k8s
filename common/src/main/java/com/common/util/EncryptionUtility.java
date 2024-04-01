@@ -3,7 +3,9 @@ package com.common.util;
 import com.common.dto.DecryptedDatasource;
 import com.common.entity.master.Tenant;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
 import java.io.BufferedReader;
@@ -17,11 +19,23 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
+@Component
 public class EncryptionUtility {
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
+    private final String base64PrivateKey;
 
-    public static byte[] encrypt(String text, PublicKey key) throws Exception {
+
+    public EncryptionUtility(ObjectMapper objectMapper, @Value("${encryption.private-key}") String base64PrivateKey) {
+        this.objectMapper = objectMapper;
+        // Remove the first and last lines (the "BEGIN" and "END" markers), and remove all line breaks
+        this.base64PrivateKey = base64PrivateKey
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+    }
+
+    public byte[] encrypt(String text, PublicKey key) throws Exception {
         // Get an instance of the Cipher for RSA encryption
         Cipher cipher = Cipher.getInstance("RSA");
 
@@ -32,7 +46,7 @@ public class EncryptionUtility {
         return cipher.doFinal(text.getBytes());
     }
 
-    public static String decrypt(byte[] encryptedText, PrivateKey key) throws Exception {
+    public String decrypt(byte[] encryptedText, PrivateKey key) throws Exception {
         // Get an instance of the Cipher for RSA decryption
         Cipher cipher = Cipher.getInstance("RSA");
 
@@ -46,52 +60,62 @@ public class EncryptionUtility {
         return new String(decryptedBytes);
     }
 
-    public static String encodeToString(byte[] data) {
+    public String encodeToString(byte[] data) {
         return Base64.getEncoder().encodeToString(data);
     }
 
-    public static byte[] decodeFromString(String encodedData) {
+    public byte[] decodeFromString(String encodedData) {
         return Base64.getDecoder().decode(encodedData);
     }
 
-    public static PrivateKey loadPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+//    public PrivateKey loadPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+//
+//        ClassPathResource classPathResource = new ClassPathResource("private.pem");
+//
+//        // Read the Base64-encoded key from file
+//        StringBuilder sb = new StringBuilder();
+//        try (BufferedReader br = new BufferedReader(new FileReader(classPathResource.getFile()))) {
+//            String line;
+//            while ((line = br.readLine()) != null) {
+//                if (!line.startsWith("-----") && !line.isEmpty())
+//                    sb.append(line);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        // Decode the Base64-encoded key bytes
+//        byte[] encodedPrivateKey = Base64.getDecoder().decode(sb.toString());
+//
+//        KeyFactory keyFactory = null;
+//        try {
+//            keyFactory = KeyFactory.getInstance("RSA");
+//            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
+//            return keyFactory.generatePrivate(privateKeySpec);
+//        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//
+//    }
 
-        ClassPathResource classPathResource = new ClassPathResource("private.pem");
 
-        // Read the Base64-encoded key from file
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(classPathResource.getFile()))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.startsWith("-----") && !line.isEmpty())
-                    sb.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        // Decode the Base64-encoded key bytes
-        byte[] encodedPrivateKey = Base64.getDecoder().decode(sb.toString());
+    public DecryptedDatasource decryptDataSource(Tenant tenant) throws Exception {
 
-        KeyFactory keyFactory = null;
-        try {
-            keyFactory = KeyFactory.getInstance("RSA");
-            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
-            return keyFactory.generatePrivate(privateKeySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        return null;
-
-    }
-
-    public static DecryptedDatasource decryptDataSource(Tenant tenant) throws Exception {
-
-        byte[] encryptedText = EncryptionUtility.decodeFromString(tenant.getEncryptedDataSource());
-        String decrypted = EncryptionUtility.decrypt(encryptedText, EncryptionUtility.loadPrivateKey());
+        byte[] encryptedText = decodeFromString(tenant.getEncryptedDataSource());
+        String decrypted = decrypt(encryptedText, loadPrivateKey());
         DecryptedDatasource decryptedDatasource = objectMapper.readValue(decrypted, DecryptedDatasource.class);
         decryptedDatasource.setTenantUuid(tenant.getTenantUuid());
         return decryptedDatasource;
+    }
+
+    public PrivateKey loadPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
+        System.out.println(base64PrivateKey);
+        byte[] encodedPrivateKey = Base64.getDecoder().decode(base64PrivateKey);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
+        return keyFactory.generatePrivate(privateKeySpec);
     }
 }
 

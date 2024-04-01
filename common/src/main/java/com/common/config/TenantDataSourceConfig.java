@@ -35,6 +35,7 @@ public class TenantDataSourceConfig {
     private final DataSource masterDataSource;
     private final JdbcTemplate masterJdbcTemplate;
     private final Environment environment;
+    private final EncryptionUtility encryptionUtility;
 
     @Bean(name = "entityManager")
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(EntityManagerFactoryBuilder builder) throws Exception {
@@ -56,7 +57,7 @@ public class TenantDataSourceConfig {
         List<Tenant> tenants = masterJdbcTemplate.query("SELECT * from tenant", TenantDataSourceConfig::convertTenants);
 
         for (Tenant tenant : tenants) {
-            DecryptedDatasource decryptedDatasource = EncryptionUtility.decryptDataSource(tenant);
+            DecryptedDatasource decryptedDatasource = encryptionUtility.decryptDataSource(tenant);
             String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+decryptedDatasource.getDataSourcePlatform());
             DataSource dataSource = createDataSourceForTenant(decryptedDatasource, driverClassName);
             targetDataSources.put(tenant.getTenantUuid(), dataSource);

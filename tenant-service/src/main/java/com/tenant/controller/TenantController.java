@@ -33,12 +33,13 @@ public class TenantController {
     private final TenantDataSourceConfig tenantDataSourceConfig;
     private final FlywayConfig flywayConfig;
     private final Environment environment;
+    private final EncryptionUtility encryptionUtility;
 
 
     @PostMapping
     public ResponseEntity<?> registerTenant(@RequestBody Tenant tenant) throws Exception {
 
-        DecryptedDatasource decryptedDatasource = EncryptionUtility.decryptDataSource(tenant);
+        DecryptedDatasource decryptedDatasource = encryptionUtility.decryptDataSource(tenant);
 
         String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+decryptedDatasource.getDataSourcePlatform());
 
