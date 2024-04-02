@@ -7,6 +7,21 @@ spring:
         enabled: true # enable to read configuration from ConfigMap
       discovery:
         enabled: true
+      reload:
+        enabled: true
+        strategy: restart_context
+        mode: event
+
+management:
+  endpoint:
+    restart:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: restart
+
 eureka:
   client:
     enabled: false
+
