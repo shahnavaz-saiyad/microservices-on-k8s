@@ -10,10 +10,7 @@ spring:
       server:
         native:
           search-locations:
-            - classpath:/config/user-service
-            - classpath:/config/sales-service
-            - classpath:/config/tenant-service
-            - classpath:/config/api-gateway
+            - classpath:/config
 server:
   port: 8888
 management:

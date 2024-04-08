@@ -5,9 +5,9 @@ message:
 
 master:
   datasource:
-    url: jdbc:mysql://localhost:3306/spring-k8s-master
-    username: root
-    password: Mysql8@admin
+    url: ${MASTER_DB_URL}
+    username: ${MASTER_DB_USERNAME}
+    password: ${MASTER_DB_PASSWD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 tenant:
