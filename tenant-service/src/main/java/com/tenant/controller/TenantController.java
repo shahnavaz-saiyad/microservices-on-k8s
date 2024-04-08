@@ -7,6 +7,8 @@ import com.common.dto.DecryptedDatasource;
 import com.common.entity.master.Tenant;
 import com.common.repository.master.TenantRepository;
 import com.common.util.EncryptionUtility;
+import com.tenant.dto.TenantDto;
+import com.tenant.service.TenantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
@@ -29,34 +31,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TenantController {
     private final TenantRepository tenantRepository;
-    private final DynamicRoutingDataSource dynamicDataSource;
-    private final TenantDataSourceConfig tenantDataSourceConfig;
-    private final FlywayConfig flywayConfig;
-    private final Environment environment;
-    private final EncryptionUtility encryptionUtility;
-
+    private final TenantService tenantService;
 
     @PostMapping
-    public ResponseEntity<?> registerTenant(@RequestBody Tenant tenant) throws Exception {
+    public ResponseEntity<?> registerTenant(@RequestBody TenantDto tenant) throws Exception {
 
-        DecryptedDatasource decryptedDatasource = encryptionUtility.decryptDataSource(tenant);
-
-        String driverClassName = environment.getProperty("tenant.datasource.driver-class-name."+decryptedDatasource.getDataSourcePlatform());
-
-        DataSource dataSource = TenantDataSourceConfig.createDataSourceForTenant(decryptedDatasource, driverClassName);
-
-        dynamicDataSource.addTargetDataSources(tenant.getTenantUuid(), dataSource);
-        dynamicDataSource.initialize();
-        flywayConfig.migrateDataSource(dataSource, decryptedDatasource.getDataSourcePlatform());
-        tenantRepository.save(tenant);
-
-
+        tenantService.registerTenant(tenant);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Tenant>> getAll(){
-        List<Tenant> tenants = tenantRepository.findAll();
+    public ResponseEntity<List<TenantDto>> getAll(){
+        List<TenantDto> tenants = tenantService.findAll();
         return ResponseEntity.ok(tenants);
     }
 

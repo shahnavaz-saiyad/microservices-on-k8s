@@ -1,16 +1,11 @@
 package com.tenant.controller;
 
 
-import com.common.config.DynamicRoutingDataSource;
-import com.common.entity.tenant.Product;
-import com.common.repository.tenant.ProductRepository;
 import com.tenant.config.ConfigMap;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,8 +16,6 @@ public class WelcomeController {
     private String messageFrom;
 
     private final DiscoveryClient discoveryClient;
-    private final DynamicRoutingDataSource dynamicRoutingDataSource;
-    private final ProductRepository productRepository;
     private final ConfigMap configMap;
 
 
@@ -38,13 +31,13 @@ public class WelcomeController {
         return "Welcome from "+ messageFrom+ " "+ configMap.getFrom();
     }
 
-
-    @PostMapping("/products/{tenantUuid}")
-    public ResponseEntity<?> addProduct(@PathVariable String tenantUuid, @RequestBody Product product){
-        dynamicRoutingDataSource.setCurrentTenant(tenantUuid);
-        productRepository.save(product);
-        dynamicRoutingDataSource.clearCurrentTenant();
-        return ResponseEntity.ok().build();
-    }
+//
+//    @PostMapping("/products/{tenantUuid}")
+//    public ResponseEntity<?> addProduct(@PathVariable String tenantUuid, @RequestBody Product product){
+//        dynamicRoutingDataSource.setCurrentTenant(tenantUuid);
+//        productRepository.save(product);
+//        dynamicRoutingDataSource.clearCurrentTenant();
+//        return ResponseEntity.ok().build();
+//    }
 
 }

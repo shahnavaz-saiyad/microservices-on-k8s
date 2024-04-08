@@ -2,17 +2,52 @@ server:
   port: 8882
 message:
   from: configserver
-spring:
-  flyway:
-    enabled: false
+
 master:
   datasource:
     url: jdbc:mysql://localhost:3306/spring-k8s-master
     username: root
     password: Mysql8@admin
     driver-class-name: com.mysql.cj.jdbc.Driver
+
 tenant:
   datasource:
     driver-class-name:
       mysql: com.mysql.cj.jdbc.Driver
       postgresql: org.postgresql.Driver
+
+spring:
+  flyway:
+    enabled: false
+
+encryption:
+  private-key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDJAqUvUplPDSgf
+    nsgC+OXGlPILJC8eyNDCTwhqMsSeqnY07gSYIyvEwxzZIZkHY3hbyUB6A0JxRZnZ
+    uL7dKpYFgyExO8KHr8Cs/nLDQU10pfr1KZcsRdaJzzk/qdivKuE/8s0h/CRgkEnb
+    GUUt3D3uZkeA0FtQEZHADQ+Tp8qp3PXRbzRPIy4IQXT4KuMoyb5oXGnzAq+NtJIK
+    cy8jn+NCNFV2xBg3UlMTDMjvFz9gAS4ZDJUNE/N/W4jpsUvuXpYEYDdxvgiiC7ic
+    z0y5T1m/fqrXafrQfFwrjQfW5Ios7Qt0s7UR1BSwLR2BBrKoAORTKOcdcO+iOkQB
+    FkQR1hS3AgMBAAECggEAWXMf5wsuxgrozAlwoEH6noAxpduYTG64138sE3Y8IQ9i
+    QvOYf8tG8uyQrd9RpgQRz2ajlqhUrOt4J3cbGHiXAiT0ZGBflNoVN+aTU2h/+2TR
+    ZL/5Ue5SJkldBIOktW6zhi2aM4Fs/ru24hVAv8O+m5RQRXZy7BKldX1abS7B9Qxf
+    +tgb44ofoMukCGdiGzAnQCCfXQbrQ7fxGmmVdZvKsf1UWJSdzdfvXXhuhCgX7SMu
+    YywaCq30tu5UIuO6IV3gCRrDzz7VzETMH6wATeQDq6lcok6lkHxkX9BV7VW8BHkB
+    rPqoTBFV4Vgtpf3rdcWsHs1W6h84QUH6yMXMR1KD4QKBgQDKs12n79bv4Cjap35W
+    7QVVUOZhR+lC/30fSn/gcuyoKlCNoI00SEoZIKdrrctV7XoxaE2PBcWAyBjmDaVx
+    q+XqtKxmR+oRm1juzvRG0rOdKVQkhTWoKwrHDL83aW/XWD4jLsaOyKCISytDHxdK
+    PFdaOgW8yjqQe8v68zEsYjPf6wKBgQD93X9IpQwZ00685lxUmAVqh10J6vuTk6F6
+    hiIB1m8uePk/nxSZr5HjmDsOAKr+bvQnXZ1gNM+zLF3SJPmD6QGpvYHqSSjbJ8A7
+    j+rS1OjCGhtsjU3HrnNCpBUBbc9YZgl6Ey/Zyd8oX2gJhMUV4B48AWOUk/mSg7QE
+    WfodgTn3ZQKBgQCB5XvpOOuWgSHtLVTrQ60dRWC9iqXTB4MZYFaecUdzZNqGSBL1
+    JDZH8AMaIB+kCzE5JEw/kUVGB/TcyHXzaGNIi0vHp+I6MkFFmF42XKQ53NhNJwiB
+    okOf121ahzji2WvIhBs+OReXAATTWMNGEXExIum2WCo7mPnY8avbc3smzQKBgQDU
+    J3RE0HGhb38AzH7izzzPfxpYvIDMHvc2/ruSz5KQwtaBvb8ohJomGsVXeWVtRmpS
+    L6Dikp/0+6HYib/f5izWnqHgmo1DQSAcZrR2xylRdSHwANK8imSWj6tiS1OZa4SF
+    +Vzm5BbTlY/LTKKsGmUJ/psqwtMyB1C8xjkIyUMZJQKBgCDRuBC6prl4bgboNjkg
+    GpDukMSEWe0ZsvK0CkyUPndgpB7WsfhpO223WrCkSgyo6cD7GgLQhDdObhOe4YeK
+    TLEX8rI0rKCQ3dkmJI+NlI6mV1JK1NjhtEOH1ElqgGwmwXDBpEvO1n8GXZLrv7oE
+    FvLH4ZWAzzhc6Y0ukaFT7VaM
+    
+    -----END PRIVATE KEY-----
