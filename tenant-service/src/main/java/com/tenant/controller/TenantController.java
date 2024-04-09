@@ -30,7 +30,7 @@ import java.util.List;
 @RequestMapping("/tenants/")
 @RequiredArgsConstructor
 public class TenantController {
-    private final TenantRepository tenantRepository;
+
     private final TenantService tenantService;
 
     @PostMapping

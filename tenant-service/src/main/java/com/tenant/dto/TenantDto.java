@@ -1,5 +1,6 @@
 package com.tenant.dto;
 
+import com.common.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,4 +17,6 @@ public class TenantDto implements Serializable {
     private String tenantName;
     private String tenantDescription;
     private String encryptedDataSource;
+    private String status;
+    private UserDto user;
 }

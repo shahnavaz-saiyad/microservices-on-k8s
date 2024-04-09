@@ -26,6 +26,8 @@ public class Tenant implements Serializable {
     @Column(name = "tenant_description")
     private String tenantDescription;
 
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "encrypted_datasource")
     private String encryptedDataSource;

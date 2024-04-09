@@ -1,4 +1,4 @@
-package com.userservice;
+package com.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@ComponentScan(value = {"com.common"})
+@ComponentScan(basePackages = {"com.common.*", "com.user.*"})
 public class UserServiceApplication {
 
     public static void main(String[] args) {

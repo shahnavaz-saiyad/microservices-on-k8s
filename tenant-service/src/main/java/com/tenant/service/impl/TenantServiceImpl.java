@@ -7,13 +7,12 @@ import com.common.dto.DecryptedDatasource;
 import com.common.entity.master.Tenant;
 import com.common.repository.master.TenantRepository;
 import com.common.util.EncryptionUtility;
-import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.common.util.KafkaUtility;
 import com.tenant.dto.TenantDto;
 import com.tenant.service.TenantService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
-import org.jose4j.lang.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,7 @@ public class TenantServiceImpl implements TenantService {
     private final DynamicRoutingDataSource dynamicDataSource;
     private final Environment environment;
     private final EncryptionUtility encryptionUtility;
+    private final KafkaUtility kafkaUtility;
 
     @Override
     public void registerTenant(TenantDto tenantDto) throws Exception {
@@ -46,7 +46,11 @@ public class TenantServiceImpl implements TenantService {
         dynamicDataSource.addTargetDataSources(tenant.getTenantUuid(), dataSource);
         dynamicDataSource.initialize();
         FlywayConfig.migrateDataSource(dataSource, decryptedDatasource.getDataSourcePlatform());
+
+        tenant.setStatus("USER_PENDING");
         tenantRepository.save(tenant);
+        kafkaUtility.sendMessage(tenant.getTenantUuid(), "initialize-tenant-datasource", "master");
+        kafkaUtility.sendMessage(tenantDto.getUser(), "create-tenant-user", tenant.getTenantUuid());
 
     }
 

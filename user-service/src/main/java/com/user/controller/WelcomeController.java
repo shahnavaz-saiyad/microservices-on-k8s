@@ -1,4 +1,4 @@
-package com.userservice.controller;
+package com.user.controller;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
