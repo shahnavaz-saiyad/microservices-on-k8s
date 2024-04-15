@@ -16,6 +16,12 @@ tenant:
       mysql: com.mysql.cj.jdbc.Driver
       postgresql: org.postgresql.Driver
 
+keycloak:
+  url: http://localhost:8089/
+  clientId: ims-app
+  clientSecret: rfC7nQkNoetBMiABhLJDqi8oGqKiYQqz
+
+
 spring:
   flyway:
     enabled: false
