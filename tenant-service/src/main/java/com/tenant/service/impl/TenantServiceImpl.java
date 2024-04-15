@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -45,13 +46,18 @@ public class TenantServiceImpl implements TenantService {
 
         dynamicDataSource.addTargetDataSources(tenant.getTenantUuid(), dataSource);
         dynamicDataSource.initialize();
-        FlywayConfig.migrateDataSource(dataSource, decryptedDatasource.getDataSourcePlatform());
+        migrateDatabase(dataSource, decryptedDatasource);
 
         tenant.setStatus("USER_PENDING");
         tenantRepository.save(tenant);
         kafkaUtility.sendMessage(tenant.getTenantUuid(), "initialize-tenant-datasource", "master");
         kafkaUtility.sendMessage(tenantDto.getUser(), "create-tenant-user", tenant.getTenantUuid());
 
+    }
+
+    @Async
+    public void migrateDatabase(DataSource dataSource, DecryptedDatasource decryptedDatasource) {
+        FlywayConfig.migrateDataSource(dataSource, decryptedDatasource.getDataSourcePlatform());
     }
 
     @Override
