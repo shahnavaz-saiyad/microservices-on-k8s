@@ -39,5 +39,11 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
     public Map<Object, Object> targetDataSources() {
         return this.targetDataSources;
     }
+
+    public void removeDataSource(String tenantUuid) {
+        targetDataSources.remove(tenantUuid);
+        super.setTargetDataSources(targetDataSources);
+        super.initialize();
+    }
 }
 

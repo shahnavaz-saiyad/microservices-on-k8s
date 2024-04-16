@@ -35,7 +35,7 @@ public class TenantServiceImpl implements TenantService {
     private final KafkaUtility kafkaUtility;
 
     @Override
-    public void registerTenant(TenantDto tenantDto) throws Exception {
+    public TenantDto registerTenant(TenantDto tenantDto) throws Exception {
 
         Tenant tenant = dtoToEntity(tenantDto);
         DecryptedDatasource decryptedDatasource = encryptionUtility.decryptDataSource(tenant);
@@ -44,20 +44,20 @@ public class TenantServiceImpl implements TenantService {
 
         DataSource dataSource = TenantDataSourceConfig.createDataSourceForTenant(decryptedDatasource, driverClassName);
 
-        dynamicDataSource.addTargetDataSources(tenant.getTenantUuid(), dataSource);
-        dynamicDataSource.initialize();
-        migrateDatabase(dataSource, decryptedDatasource);
+        migrateDatabase(dataSource, decryptedDatasource, tenant.getTenantUuid());
 
         tenant.setStatus("USER_PENDING");
-        tenantRepository.save(tenant);
-        kafkaUtility.sendMessage(tenant.getTenantUuid(), "initialize-tenant-datasource", "master");
+        Tenant savedTenant = tenantRepository.save(tenant);
         kafkaUtility.sendMessage(tenantDto.getUser(), "create-tenant-user", tenant.getTenantUuid());
-
+        return entityToDto(savedTenant);
     }
 
     @Async
-    public void migrateDatabase(DataSource dataSource, DecryptedDatasource decryptedDatasource) {
+    public void migrateDatabase(DataSource dataSource, DecryptedDatasource decryptedDatasource, String tenantUuid) {
+        dynamicDataSource.addTargetDataSources(tenantUuid, dataSource);
+        dynamicDataSource.initialize();
         FlywayConfig.migrateDataSource(dataSource, decryptedDatasource.getDataSourcePlatform());
+        kafkaUtility.sendMessage(tenantUuid, "initialize-tenant-datasource", "master");
     }
 
     @Override

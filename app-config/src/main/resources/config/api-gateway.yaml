@@ -9,3 +9,7 @@ spring:
             uri: lb://user-service
             predicates:
               - Path=/user-service/**
+          - id: tenant-service
+            uri: lb://tenant-service
+            predicates:
+              - Path=/tenant-service/**

@@ -1,29 +1,13 @@
 package com.tenant.controller;
 
-import com.common.config.DynamicRoutingDataSource;
-import com.common.config.FlywayConfig;
-import com.common.config.TenantDataSourceConfig;
-import com.common.dto.DecryptedDatasource;
-import com.common.entity.master.Tenant;
-import com.common.repository.master.TenantRepository;
-import com.common.util.EncryptionUtility;
 import com.tenant.dto.TenantDto;
 import com.tenant.service.TenantService;
+import com.tenant.util.SseUtility;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import javax.sql.DataSource;
-import java.io.*;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -32,12 +16,20 @@ import java.util.List;
 public class TenantController {
 
     private final TenantService tenantService;
+    private final SseUtility sseUtility;
 
     @PostMapping
-    public ResponseEntity<?> registerTenant(@RequestBody TenantDto tenant) throws Exception {
+    public ResponseEntity<TenantDto> registerTenant(@RequestBody TenantDto tenant) throws Exception {
 
-        tenantService.registerTenant(tenant);
-        return ResponseEntity.ok().build();
+        TenantDto tenantDto = tenantService.registerTenant(tenant);
+        return ResponseEntity.ok(tenantDto);
+    }
+
+    @RequestMapping(value = "/{tenantUuid}/sse/subscribe")
+    public SseEmitter subscribeSse(@PathVariable String tenantUuid){
+        SseEmitter sse = new SseEmitter(86400000L);
+        sseUtility.addEmitter(tenantUuid, sse);
+        return sse;
     }
 
     @GetMapping
