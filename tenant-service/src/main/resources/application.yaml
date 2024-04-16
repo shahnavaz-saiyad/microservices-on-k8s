@@ -5,6 +5,9 @@ spring:
     import: configserver:http://localhost:8888  # Configuration for non-Kubernetes (default profile)
     activate:
       on-profile: local
+server:
+  servlet:
+    context-path: /tenant-service
 eureka:
   client:
     fetch-registry: true

@@ -12,6 +12,10 @@ spring:
         strategy: restart_context
         mode: event
 
+server:
+  servlet:
+    context-path: /tenant-service
+
 management:
   endpoint:
     restart:

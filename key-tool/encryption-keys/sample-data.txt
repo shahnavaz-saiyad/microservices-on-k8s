@@ -9,8 +9,8 @@ For Postgresql
 For Mysql
 
 {
-    "dataSourceUrl": "jdbc:mysql://localhost:3306/spring-k8s-t1",
-    "dataSourceUsername": "root",
+    "dataSourceUrl": "jdbc:mysql://mysql:3306/spring-k8s-t1",
+    "dataSourceUsername": "mysqladmin",
     "dataSourcePassword": "Mysql8@admin",
     "dataSourcePlatform": "mysql"
 }
